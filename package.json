@@ -1,0 +1,14 @@
+{
+  "name": "am-may",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Am Mây — chánh điện online 2.5D, nhiều người cùng ngồi tụng",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

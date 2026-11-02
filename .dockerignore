@@ -1,0 +1,5 @@
+node_modules
+gemini
+tools
+.DS_Store
+*.md

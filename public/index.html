@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1a0c06">
+<meta name="description" content="Am Mây — chánh điện online. Vào ngồi bồ đoàn, tụng kinh, dâng hương cùng mọi người.">
+<title>Am Mây · Chánh điện online</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><span class="logo" aria-hidden="true">卍</span><span class="brand-name">Am Mây</span></div>
+    <button id="roomBtn" class="chip room" type="button" title="Đổi phòng">
+      <span class="dot" aria-hidden="true"></span><b id="count">0</b> phật tử · <span id="roomName">Phòng 1</span>
+    </button>
+    <div class="top-actions">
+      <button id="quickSound" class="icon-btn" type="button" aria-label="Tắt âm thanh" title="Âm thanh">
+        <svg class="on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none"/></svg>
+        <svg class="off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 9.5l5 5m0-5l-5 5" fill="none"/></svg>
+      </button>
+      <button id="menuBtn" class="icon-btn" type="button" aria-label="Cài đặt" title="Cài đặt">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" fill="none"/><circle cx="16" cy="7" r="2" fill="none"/><circle cx="10" cy="17" r="2" fill="none"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <aside class="info" aria-label="Trong chánh điện">
+    <div id="event" class="event" hidden></div>
+    <section id="board" class="card board empty">
+      <h3>Tấm lòng thành</h3>
+      <ol id="boardList"></ol>
+      <p class="empty-msg">Chưa ai dâng cúng. Tụng một câu hay dâng hương để mở đầu.</p>
+    </section>
+    <section class="card feed-card">
+      <h3>Hoạt động</h3>
+      <div id="feed" class="feed" aria-live="polite"></div>
+    </section>
+  </aside>
+
+  <main id="stage">
+    <canvas id="wings" aria-hidden="true"></canvas>
+    <canvas id="c" aria-label="Chánh điện: tượng Phật trên toà sen và các phật tử đang ngồi tụng"></canvas>
+    <div id="dedication" class="dedication" hidden><small id="dedName"></small><p id="dedWish"></p></div>
+    <div id="tip" class="tip" hidden></div>
+    <div id="toast" class="toast" role="status"></div>
+  </main>
+
+  <aside class="controls" aria-label="Hành động">
+    <section class="card group">
+      <h3>Cúng dường</h3>
+      <div class="grid">
+        <button type="button" class="act" data-offer="petal" title="Rải cánh sen (Q)"><img src="/assets/fx_petal.png" alt=""><span>Cánh sen</span><kbd>Q</kbd></button>
+        <button type="button" class="act" data-offer="incense" title="Dâng hương (W)"><img src="/assets/fx_incense.png" alt=""><span>Hương</span><kbd>W</kbd></button>
+        <button type="button" class="act" data-offer="lotus" title="Dâng hoa sen (E)"><img src="/assets/fx_lotus.png" alt=""><span>Hoa sen</span><kbd>E</kbd></button>
+        <button type="button" class="act" data-offer="bell" title="Thỉnh chuông (R)"><img src="/assets/fx_bell.png" alt=""><span>Chuông</span><kbd>R</kbd></button>
+      </div>
+    </section>
+    <section class="card group">
+      <h3>Tu tập</h3>
+      <div class="grid">
+        <button type="button" class="act" data-act="chant" title="Tụng kinh (1)"><img src="/assets/fx_scroll.png" alt=""><span>Tụng</span><kbd>1</kbd></button>
+        <button type="button" class="act" data-act="bow" title="Lễ Phật (2)"><img src="/assets/fx_halo.png" alt=""><span>Lễ</span><kbd>2</kbd></button>
+        <button type="button" class="act" data-act="mo" title="Gõ mõ (Space)"><img src="/assets/fx_mo.png" alt=""><span>Mõ</span><kbd>Space</kbd></button>
+        <button type="button" class="act primary" data-act="wish" title="Lời nguyện (3)"><img src="/assets/fx_banner.png" alt=""><span>Nguyện</span><kbd>3</kbd></button>
+      </div>
+    </section>
+    <section class="card tips">
+      <h3>Mẹo</h3>
+      <ul>
+        <li>Bấm vào bồ đoàn trống để đổi chỗ</li>
+        <li>Bấm mõ hoặc chuông trên bàn thờ để gõ</li>
+        <li>Bấm chỗ khác trong điện để tụng một câu</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+<div id="wishPanel" class="modal" hidden>
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="wishTitle">
+    <h2 id="wishTitle">Lời nguyện hồi hướng</h2>
+    <p>Lời nguyện được xướng lên cùng phần dâng cúng, ai trong chánh điện cũng thấy.</p>
+    <textarea id="wishText" maxlength="80" rows="2" placeholder="Ví dụ: Nguyện cho mẹ được an lành"></textarea>
+    <div class="counter"><span id="wishCount">0</span>/80</div>
+    <div id="wishPresets" class="presets"></div>
+    <label class="field-label">Kèm theo</label>
+    <div class="seg" id="wishKind">
+      <button type="button" data-kind="incense" aria-pressed="true"><img src="/assets/fx_incense.png" alt="">Dâng hương</button>
+      <button type="button" data-kind="lotus" aria-pressed="false"><img src="/assets/fx_lotus.png" alt="">Hoa sen</button>
+      <button type="button" data-kind="bell" aria-pressed="false"><img src="/assets/fx_bell.png" alt="">Thỉnh chuông</button>
+    </div>
+    <div class="panel-actions">
+      <button id="wishCancel" class="btn" type="button">Thôi</button>
+      <button id="wishSend" class="btn primary" type="button">Hồi hướng</button>
+    </div>
+  </section>
+</div>
+
+<div id="menu" class="modal" hidden>
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
+    <h2 id="menuTitle">Cài đặt</h2>
+    <div class="menu-row"><span>Nhạc nền</span><button id="musicBtn" class="btn" type="button">Trăng trên rừng trúc</button></div>
+    <div class="menu-row"><span>Âm thanh</span><button id="soundBtn" class="btn" type="button">Đang bật</button></div>
+    <div class="menu-row"><span>Giọng đọc</span><button id="voiceBtn" class="btn" type="button">Đang bật</button></div>
+    <p id="voiceInfo" class="hint"></p>
+    <h3>Phòng</h3>
+    <ul id="roomList"></ul>
+    <h3 class="keys">Phím tắt</h3>
+    <p class="hint keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd> cúng dường · <kbd>1</kbd> tụng · <kbd>2</kbd> lễ · <kbd>Space</kbd> mõ · <kbd>3</kbd> nguyện · <kbd>Esc</kbd> đóng</p>
+    <div class="panel-actions">
+      <button id="leaveBtn" class="btn" type="button">Rời chánh điện</button>
+      <button id="menuClose" class="btn primary" type="button">Xong</button>
+    </div>
+  </section>
+</div>
+
+<form id="gate" class="gate">
+  <div class="gate-card">
+    <div class="gate-art" aria-hidden="true"></div>
+    <div class="gate-form">
+      <p class="kicker">Chánh điện online · cùng ngồi tụng</p>
+      <h1>Am Mây</h1>
+      <p class="lead">Vào ngồi bồ đoàn, tụng kinh, dâng hương và gửi lời nguyện cùng mọi người đang ở trong điện.</p>
+      <label for="dharma" class="field-label">Pháp danh</label>
+      <input id="dharma" maxlength="20" autocomplete="nickname" placeholder="Ví dụ: Diệu Hạnh, Minh Tâm…" required>
+      <span class="field-label">Y phục</span>
+      <div class="skins" id="skins"></div>
+      <button type="submit" class="btn primary big">Vào chánh điện</button>
+    </div>
+  </div>
+</form>
+<script type="module" src="/main.js"></script>
+</body>
+</html>
