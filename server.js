@@ -67,6 +67,7 @@ const server = http.createServer(async (req, res) => {
     // CDN keep them for an hour.
     if (rel.startsWith('/assets/pray/')) headers['cache-control'] = PROD ? 'public, max-age=3600' : 'no-cache';
     else if (rel.startsWith('/assets/')) headers['cache-control'] = 'public, max-age=86400';
+    else headers['cache-control'] = 'no-cache'; // code and pages must change the moment a new version is deployed
     res.writeHead(200, headers);
     res.end(data);
   } catch {
