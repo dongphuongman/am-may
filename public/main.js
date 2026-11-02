@@ -292,6 +292,8 @@ const BOW_POSE = {
 // Drawn prayer poses (tools/import_pray.py): 1 kneel, palms joined · 2 palms at the forehead · 3 bending · 4 forehead
 // on the floor. Outfits without a full set keep the banded bow below.
 const PRAY = {};
+// Bump after re-importing poses so the CDN serves the new files instead of what it already holds.
+const POSE_VERSION = 2;
 // Fetched only once the hall and the sprites are in, so the poses never hold up the first paint.
 Promise.all(Object.values(A).map((im) => im.decode().catch(() => {})))
   .then(() => fetch('/assets/pray/manifest.json'))
@@ -301,7 +303,7 @@ Promise.all(Object.values(A).map((im) => im.decode().catch(() => {})))
       if (!SKINS.includes(k)) continue;
       const frames = [1, 2, 3, 4].map((n) => {
         const im = new Image();
-        im.src = `/assets/pray/${k}_${n}.webp`;
+        im.src = `/assets/pray/${k}_${n}.webp?v=${POSE_VERSION}`;
         return im;
       });
       Promise.all(frames.map((im) => im.decode())).then(() => (PRAY[k] = frames.map(measurePose))).catch(() => {});
