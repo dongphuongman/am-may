@@ -7,6 +7,9 @@ import { SEATS, FILL_ORDER, SKINS, SUTRA, OFFERINGS } from './public/seats.js';
 
 const PORT = Number(process.env.PORT) || 5173;
 const PROD = process.env.NODE_ENV === 'production';
+// Stamped on the page's code URLs, so after a redeploy the CDN and browsers fetch the new code rather than a copy
+// they kept of the old one.
+const BUILD = Date.now().toString(36);
 const CAPACITY = SEATS.length;
 const DEFAULT_ROOMS = ['am-1', 'am-2', 'am-3', 'am-4', 'am-5', 'am-6'];
 const PUBLIC = fileURLToPath(new URL('./public/', import.meta.url));
@@ -61,7 +64,13 @@ const server = http.createServer(async (req, res) => {
     const rel = url.pathname === '/' ? '/index.html' : decodeURIComponent(url.pathname);
     const file = normalize(join(PUBLIC, rel));
     if (!file.startsWith(PUBLIC)) throw new Error('outside');
-    const data = await readFile(file);
+    // A code URL stamped by another build (the old container during a redeploy, or the other way round) is not ours
+    // to answer: a 404 nobody caches beats the CDN keeping mismatched code under that URL.
+    const v = url.searchParams.get('v');
+    if (v && /\.(js|css)$/.test(rel) && v !== BUILD) throw new Error('other build');
+    let data = await readFile(file);
+    if (rel === '/index.html') data = data.toString().replaceAll('?v=dev', `?v=${BUILD}`);
+    else if (rel.endsWith('.js')) data = data.toString().replace(/(from '\.\/[\w-]+\.js)'/g, `$1?v=${BUILD}'`);
     const headers = { 'content-type': MIME[extname(file)] || 'application/octet-stream' };
     // Prayer poses get re-imported while drawing them, so locally always check for a newer file; deployed, let the
     // CDN keep them for an hour.
