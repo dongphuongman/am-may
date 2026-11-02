@@ -6,6 +6,7 @@ import { WebSocketServer } from 'ws';
 import { SEATS, FILL_ORDER, SKINS, SUTRA, OFFERINGS } from './public/seats.js';
 
 const PORT = Number(process.env.PORT) || 5173;
+const PROD = process.env.NODE_ENV === 'production';
 const CAPACITY = SEATS.length;
 const DEFAULT_ROOMS = ['am-1', 'am-2', 'am-3', 'am-4', 'am-5', 'am-6'];
 const PUBLIC = fileURLToPath(new URL('./public/', import.meta.url));
@@ -15,6 +16,7 @@ const MIME = {
   '.css': 'text/css; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.jpg': 'image/jpeg',
   '.mp3': 'audio/mpeg',
   '.json': 'application/json',
@@ -61,8 +63,9 @@ const server = http.createServer(async (req, res) => {
     if (!file.startsWith(PUBLIC)) throw new Error('outside');
     const data = await readFile(file);
     const headers = { 'content-type': MIME[extname(file)] || 'application/octet-stream' };
-    // Prayer poses are re-imported while drawing them with Gemini, so always check for a newer file.
-    if (rel.startsWith('/assets/pray/')) headers['cache-control'] = 'no-cache';
+    // Prayer poses get re-imported while drawing them, so locally always check for a newer file; deployed, let the
+    // CDN keep them for an hour.
+    if (rel.startsWith('/assets/pray/')) headers['cache-control'] = PROD ? 'public, max-age=3600' : 'no-cache';
     else if (rel.startsWith('/assets/')) headers['cache-control'] = 'public, max-age=86400';
     res.writeHead(200, headers);
     res.end(data);

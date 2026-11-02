@@ -11,7 +11,7 @@ Poses:   1 kneeling, palms joined at the chest · 2 joined palms raised to the f
          3 bending forward halfway · 4 full prostration, forehead on the floor
 
 The plain background is removed (flood fill from the edges), each pose is trimmed to its figure and saved as
-public/assets/pray/<outfit>_<n>.png. The game picks them up on reload; an outfit with any pose missing keeps
+public/assets/pray/<outfit>_<n>.webp. The game picks them up on reload; an outfit with any pose missing keeps
 the built-in bow.
 """
 from pathlib import Path
@@ -128,12 +128,12 @@ def main():
             print(f'  {f.name}: không tách được 4 dáng ({e}). Hãy để các dáng cách nhau rõ, hoặc lưu từng dáng riêng.')
             continue
         for i, pose in enumerate(poses, start=int(n or 1)):
-            finish(pose).save(OUT / f'{outfit}_{i}.png')
+            finish(pose).save(OUT / f'{outfit}_{i}.webp', quality=82, method=6)
             done.setdefault(outfit, set()).add(i)
-        print(f'  {f.name} → {", ".join(f"{outfit}_{i}.png" for i in range(int(n or 1), int(n or 1) + len(poses)))}')
+        print(f'  {f.name} → {", ".join(f"{outfit}_{i}.webp" for i in range(int(n or 1), int(n or 1) + len(poses)))}')
     complete = []
     for outfit in OUTFITS:
-        have = {int(p.stem.split('_')[1]) for p in OUT.glob(f'{outfit}_[1-4].png')}
+        have = {int(p.stem.split('_')[1]) for p in OUT.glob(f'{outfit}_[1-4].webp')}
         if not {1, 2, 3, 4} - have:
             complete.append(outfit)
         missing = sorted({1, 2, 3, 4} - have)

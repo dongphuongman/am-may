@@ -70,11 +70,11 @@ new ResizeObserver(fitCanvas).observe($('#stage'));
 // ---------- Assets ----------
 const ASSET_FILES = {
   hall: 'hall.jpg',
-  monk: 'c_monk.png', nun: 'c_nun.png', granny: 'c_granny.png', man: 'c_man.png', woman: 'c_woman.png', child: 'c_child.png',
-  anim_man: 'anim_man.png', anim_woman: 'anim_woman.png', anim_granny: 'anim_granny.png',
-  lotus: 'fx_lotus.png', halo: 'fx_halo.png', bell: 'fx_bell.png', incense: 'fx_incense.png', petal: 'fx_petal.png',
-  mo: 'fx_mo.png', banner: 'fx_banner.png', scroll: 'fx_scroll.png',
-  p_nun: 'p_nun.png', p_monk: 'p_monk.png', p_child: 'p_child.png',
+  monk: 'c_monk.webp', nun: 'c_nun.webp', granny: 'c_granny.webp', man: 'c_man.webp', woman: 'c_woman.webp', child: 'c_child.webp',
+  anim_man: 'anim_man.webp', anim_woman: 'anim_woman.webp', anim_granny: 'anim_granny.webp',
+  lotus: 'fx_lotus.webp', halo: 'fx_halo.webp', bell: 'fx_bell.webp', incense: 'fx_incense.webp', petal: 'fx_petal.webp',
+  mo: 'fx_mo.webp', banner: 'fx_banner.webp', scroll: 'fx_scroll.webp',
+  p_nun: 'p_nun.webp', p_monk: 'p_monk.webp', p_child: 'p_child.webp',
 };
 const A = {};
 for (const [k, f] of Object.entries(ASSET_FILES)) {
@@ -280,7 +280,7 @@ function onChant(v, line) {
 const BOW_RAISE = 0.6, BOW_LEN = 1.9, BOW_COUNT = 3, BOW_LOWER = 0.4;
 const BOW_TOTAL = BOW_RAISE + BOW_COUNT * BOW_LEN + BOW_LOWER;
 // Rows in each source image: top of the head, neck, hips.
-// The walking strips kneel without the book in frame 6; p_*.png are the seated sprites with the book removed.
+// The walking strips kneel without the book in frame 6; p_*.webp are the seated sprites with the book removed.
 const BOW_POSE = {
   man: { img: 'anim_man', frame: 6, top: 58, neck: 108, hip: 230 },
   woman: { img: 'anim_woman', frame: 6, top: 52, neck: 108, hip: 232 },
@@ -292,14 +292,16 @@ const BOW_POSE = {
 // Drawn prayer poses (tools/import_pray.py): 1 kneel, palms joined · 2 palms at the forehead · 3 bending · 4 forehead
 // on the floor. Outfits without a full set keep the banded bow below.
 const PRAY = {};
-fetch('/assets/pray/manifest.json')
+// Fetched only once the hall and the sprites are in, so the poses never hold up the first paint.
+Promise.all(Object.values(A).map((im) => im.decode().catch(() => {})))
+  .then(() => fetch('/assets/pray/manifest.json'))
   .then((r) => (r.ok ? r.json() : {}))
   .then(({ outfits = [] }) => {
     for (const k of outfits) {
       if (!SKINS.includes(k)) continue;
       const frames = [1, 2, 3, 4].map((n) => {
         const im = new Image();
-        im.src = `/assets/pray/${k}_${n}.png`;
+        im.src = `/assets/pray/${k}_${n}.webp`;
         return im;
       });
       Promise.all(frames.map((im) => im.decode())).then(() => (PRAY[k] = frames.map(measurePose))).catch(() => {});
