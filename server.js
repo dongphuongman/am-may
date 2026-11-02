@@ -70,7 +70,8 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, headers);
     res.end(data);
   } catch {
-    res.writeHead(404, { 'content-type': 'text/plain' });
+    // never let the CDN keep a 404: during a redeploy the old container briefly answers for files only the new one has
+    res.writeHead(404, { 'content-type': 'text/plain', 'cache-control': 'no-store' });
     res.end('Not found');
   }
 });
